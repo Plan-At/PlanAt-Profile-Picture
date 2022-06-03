@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <title>Document</title>
+    <script>
+    </script>
+</head>
+<body>
+  <form method="post" action="https://api.752628.xyz/v2/hosting/image/upload" enctype="multipart/form-data" id="imgSubmitForm">
+    <label for="file">Choose file to upload</label><br>
+    <input type="file" id="file" name="image_file" accept="image/*"><br>
+    <input type="text" name="pa_token_form"><br>
+    <input type="submit" value="Submit">
+  </form>
+  <script>
+    function profileUpdateJSON(imgId, imgUrl) {
+      //this takes in an image id and a url to an image and formats them as a JSON
+      //returns a string
+      //backgrounds not implemented
+      return JSON.stringify(
+      {
+        "avatar": {
+          "image_id": imgId,
+          "image_url": imgUrl
+        },
+        "background": {
+          "image_id": "!!NOT IMPLEMENTED!!",
+          "image_url": "!!NOT IMPLEMENTED!!"
+        }
+
+      }
+      )
+    }
+    function changeProfile(results) {
+      //this updates a profile picture
+      //this is called by the "upload image" function
+      var imageId = results.image_id;
+      var imageUrl = results.image_url;
+      //console.log(imageUrl);
+      const xhr = new XMLHttpRequest();
+      xhr.addEventListener("load", function(event) {alert("profile pic updated")});
+      xhr.addEventListener("error", function(event) {alert("error :(")});
+      xhr.open("POST", "https://api.752628.xyz/v2/user/profile/picture/update");
+      xhr.setRequestHeader("Accept", "application/json");
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.setRequestHeader("pa-token", "aaaaaaaa");
+      xhr.send(profileUpdateJSON(imageId, imageUrl));
+    }
+    function uploadImage() {
+      //this uploads an image to the server
+      //references the above form
+      const xhr = new XMLHttpRequest();
+      const fd = new FormData(form)
+      xhr.addEventListener("load", function(event) {changeProfile(JSON.parse(event.target.responseText))})
+      xhr.addEventListener("error", function(event) {alert("error :(")})
+      xhr.open("POST", "https://api.752628.xyz/v2/hosting/image/upload");
+      xhr.send(fd);
+    }
+    //this overrides the submit button so that instead of action it calls the uploadImage function
+    const form = document.getElementById("imgSubmitForm")
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+      uploadImage()
+    })
+  </script>
+</body>
+</html>
